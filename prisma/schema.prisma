@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+//  ADMIN GİRİŞİ
+// ============================================================
+model Kullanici {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  sifreHash String // şifre asla düz metin saklanmaz
+  ad        String
+  olusturma DateTime @default(now())
+}
+
+// ============================================================
+//  ÜRÜNLER
+// ============================================================
+model Kategori {
+  id      String @id @default(cuid())
+  ad      String @unique
+  slug    String @unique // adres için: "kisiye-ozel-parsomenler"
+  sira    Int    @default(0)
+  urunler Urun[] // bu kategorideki ürünler
+}
+
+model Urun {
+  id         String       @id @default(cuid())
+  ad         String
+  slug       String       @unique
+  aciklama   String
+  kategoriId String
+  kategori   Kategori     @relation(fields: [kategoriId], references: [id])
+  gorseller  UrunGorsel[]
+  oneCikan   Boolean      @default(false) // ana sayfada gösterilsin mi?
+  yayinda    Boolean      @default(true) // false ise siteden gizlenir
+  olusturma  DateTime     @default(now())
+  guncelleme DateTime     @updatedAt
+
+  @@index([kategoriId])
+  @@index([oneCikan])
+}
+
+model UrunGorsel {
+  id       String  @id @default(cuid())
+  urunId   String
+  urun     Urun    @relation(fields: [urunId], references: [id], onDelete: Cascade)
+  url      String
+  publicId String // görseli silmek için gerekli kimlik
+  alt      String? // görme engelliler ve Google için açıklama
+
+  // Fotoğrafın gerçek en-boy oranını bilmek için. Detay sayfasında
+  // görseli kendi oranında gösteriyoruz, böylece hiçbir şey kırpılmıyor.
+  // Boş olabilir: bu alanlar eklenmeden önce yüklenmiş görseller var.
+  genislik  Int?
+  yukseklik Int?
+
+  sira     Int     @default(0) // 0 = kapak görseli
+
+  @@index([urunId])
+}
+
+// ============================================================
+//  DUYURU VE ETKİNLİKLER
+// ============================================================
+enum DuyuruTuru {
+  DUYURU
+  ETKINLIK
+}
+
+model Duyuru {
+  id            String     @id @default(cuid())
+  tur           DuyuruTuru @default(DUYURU)
+  baslik        String
+  slug          String     @unique
+  aciklama      String
+  kapakUrl      String?
+  kapakPublicId String?
+  tarih         DateTime? // etkinlik tarihi
+  yer           String? // etkinlik yeri
+  yayinda       Boolean    @default(true)
+  olusturma     DateTime   @default(now())
+  guncelleme    DateTime   @updatedAt
+}
+
+// ============================================================
+//  GALERİ
+// ============================================================
+enum GaleriTuru {
+  ATOLYE
+  URETIM
+  ETKINLIK
+  STAND
+  MUSTERI
+  DIGER
+}
+
+model GaleriFoto {
+  id        String     @id @default(cuid())
+  tur       GaleriTuru @default(DIGER)
+  url       String
+  publicId  String
+  aciklama  String?
+  sira      Int        @default(0)
+  olusturma DateTime   @default(now())
+
+  @@index([tur])
+}
+
+// ============================================================
+//  İLETİŞİM FORMU MESAJLARI
+// ============================================================
+model Mesaj {
+  id        String   @id @default(cuid())
+  adSoyad   String
+  email     String
+  konu      String
+  icerik    String
+  okundu    Boolean  @default(false)
+  olusturma DateTime @default(now())
+
+  @@index([okundu])
+}
+
+// ============================================================
+//  SIKÇA SORULAN SORULAR
+// ============================================================
+model SoruCevap {
+  id      String  @id @default(cuid())
+  soru    String
+  cevap   String
+  sira    Int     @default(0)
+  yayinda Boolean @default(true)
+}
+
+// ============================================================
+//  SİTE AYARLARI  (tek satırlık tablo)
+//  Panelden düzenlenecek her şey burada
+// ============================================================
+model SiteAyar {
+  id String @id @default("tek")
+
+  // İletişim
+  telefon  String?
+  whatsapp String?
+  email    String?
+  adres    String?
+  mapsUrl  String?
+
+  // Çalışma saatleri
+  calismaSaatleri String?
+
+  // Sosyal medya
+  instagram String?
+  facebook  String?
+  youtube   String?
+
+  // Hakkımızda sayfası metinleri
+  hikaye         String?
+  sahipAdi       String?
+  sahipBiyografi String?
+  malzemeBilgi   String?
+
+  guncelleme DateTime @updatedAt
+}

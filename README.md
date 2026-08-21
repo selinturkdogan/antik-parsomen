@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Antik Parşömen
 
-## Getting Started
+El yapımı parşömen sanatı, hat ve kaligrafi ürünleri satan **Antik Parşömen** dükkanı için tanıtım sitesi.
 
-First, run the development server:
+## Özellikler
+
+- **Ürün galerisi** — kategori filtresi, arama, ürün detay sayfası, ışık kutusu (lightbox)
+- **Duyurular ve etkinlikler** — atölye çalışmaları, sergiler, kermesler
+- **Foto galeri** — atölye, üretim aşamaları ve etkinlik fotoğrafları
+- **İletişim formu** — gelen mesajlar panele düşer
+- **Admin paneli** — ürün, duyuru, galeri ve site ayarlarının yönetimi
+
+## Teknolojiler
+
+| Katman | Araç |
+|---|---|
+| Framework | Next.js 16 (App Router) + React 19 |
+| Dil | TypeScript |
+| Stil | Tailwind CSS 4 |
+| Veritabanı | PostgreSQL (Neon) |
+| ORM | Prisma 7 |
+| Görseller | Cloudinary |
+
+## Kurulum
+
+```bash
+npm install
+```
+
+Proje kökünde bir `.env` dosyası oluşturun:
+
+```
+DATABASE_URL="postgresql://..."
+CLOUDINARY_CLOUD_NAME="..."
+CLOUDINARY_API_KEY="..."
+CLOUDINARY_API_SECRET="..."
+```
+
+Veritabanı tablolarını oluşturun ve başlangıç verilerini ekleyin:
+
+```bash
+npx prisma migrate dev
+npx prisma db seed
+```
+
+Geliştirme sunucusunu başlatın:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Site [http://localhost:3000](http://localhost:3000) adresinde çalışır.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Yardımcı komutlar
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npx prisma studio                                  # veritabanını tarayıcıda görüntüle
+npx tsx prisma/gorsel-ekle.ts <urun-slug> <dosya>  # ürüne fotoğraf yükle
+```
 
-## Learn More
+## Proje yapısı
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/           # sayfalar (klasör adı = adres)
+├── components/    # yeniden kullanılan arayüz parçaları
+├── lib/           # veritabanı ve Cloudinary bağlantıları
+└── generated/     # Prisma'nın ürettiği kod (git'e dahil değil)
+prisma/
+├── schema.prisma  # veritabanı tabloları
+├── migrations/    # veritabanı değişiklik geçmişi
+└── seed.ts        # başlangıç verileri
+```
