@@ -87,18 +87,34 @@ enum DuyuruTuru {
 }
 
 model Duyuru {
-  id            String     @id @default(cuid())
-  tur           DuyuruTuru @default(DUYURU)
-  baslik        String
-  slug          String     @unique
-  aciklama      String
-  kapakUrl      String?
-  kapakPublicId String?
-  tarih         DateTime? // etkinlik tarihi
-  yer           String? // etkinlik yeri
-  yayinda       Boolean    @default(true)
-  olusturma     DateTime   @default(now())
-  guncelleme    DateTime   @updatedAt
+  id             String           @id @default(cuid())
+  tur            DuyuruTuru       @default(DUYURU)
+  baslik         String
+  slug           String           @unique
+  aciklama       String
+  kapakUrl       String?
+  kapakPublicId  String?
+  // Detay sayfasında kapağı kendi oranında göstermek için
+  kapakGenislik  Int?
+  kapakYukseklik Int?
+  tarih          DateTime? // etkinlik tarihi
+  yer            String? // etkinlik yeri
+  yayinda        Boolean          @default(true)
+  olusturma      DateTime         @default(now())
+  guncelleme     DateTime         @updatedAt
+  eskiSluglar    DuyuruEskiSlug[]
+}
+
+// Başlık değişince adres de değişiyor; eski adresi saklayıp yeni
+// adrese yönlendiriyoruz. Paylaşılmış duyuru bağlantıları kırılmasın.
+model DuyuruEskiSlug {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  duyuruId  String
+  duyuru    Duyuru   @relation(fields: [duyuruId], references: [id], onDelete: Cascade)
+  olusturma DateTime @default(now())
+
+  @@index([duyuruId])
 }
 
 // ============================================================
