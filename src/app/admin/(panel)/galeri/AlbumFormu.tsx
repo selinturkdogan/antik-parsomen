@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
+import DosyaSecici from "@/components/DosyaSecici";
 import { GALERI_TURLERI } from "@/lib/galeri";
 import { girdiIcinTarih } from "@/lib/tarih";
 import {
@@ -39,7 +40,6 @@ const kutu =
 
 export default function AlbumFormu({ album }: { album?: Album }) {
   const [durum, formGonder, bekliyor] = useActionState(albumKaydet, baslangic);
-  const [secilenler, setSecilenler] = useState<string[]>([]);
 
   return (
     <div className="space-y-7">
@@ -142,28 +142,12 @@ export default function AlbumFormu({ album }: { album?: Album }) {
           </p>
 
           <div className="mt-4">
-            <input
-              type="file"
+            <DosyaSecici
               name="fotograflar"
-              multiple
-              accept="image/jpeg,image/png,image/webp,image/avif"
-              onChange={(e) =>
-                setSecilenler(Array.from(e.target.files ?? []).map((f) => f.name))
-              }
-              className="block w-full cursor-pointer rounded-xl border border-dashed border-parsomen-400 bg-parsomen-100 px-4 py-4 text-sm text-murekkep-700 file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-muhur-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-parsomen-50 hover:file:bg-muhur-700"
+              coklu
+              etiket="Fotoğraf Seç"
+              ipucu="Tek seferde en fazla 8-10 fotoğraf önerilir — kalanları kaydettikten sonra ekleyebilirsiniz."
             />
-
-            {secilenler.length > 0 && (
-              <p className="mt-3 text-xs text-murekkep-700">
-                {secilenler.length} fotoğraf seçildi
-              </p>
-            )}
-
-            <p className="mt-3 text-xs text-murekkep-500">
-              Birden fazla seçebilirsiniz. Tek seferde <strong>en fazla 8-10
-              fotoğraf</strong> önerilir — daha fazlası yüklemeyi
-              yavaşlatabilir, kalanları kaydettikten sonra ekleyebilirsiniz.
-            </p>
           </div>
         </div>
 
@@ -196,11 +180,6 @@ export default function AlbumFormu({ album }: { album?: Album }) {
             Vazgeç
           </Link>
 
-          {bekliyor && secilenler.length > 0 && (
-            <span className="text-xs text-murekkep-500">
-              {secilenler.length} fotoğraf yükleniyor, sayfayı kapatmayın...
-            </span>
-          )}
         </div>
       </form>
 

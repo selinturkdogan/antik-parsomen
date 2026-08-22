@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import DosyaSecici from "@/components/DosyaSecici";
 import { useActionState, useState, useTransition } from "react";
 import { girdiIcinTarih } from "@/lib/tarih";
 import { duyuruKapakSil, duyuruKaydet, type DuyuruDurumu } from "./actions";
@@ -30,7 +31,6 @@ export default function DuyuruFormu({ duyuru }: { duyuru?: Duyuru }) {
   const [tur, setTur] = useState<"DUYURU" | "ETKINLIK">(
     duyuru?.tur ?? "DUYURU"
   );
-  const [secilenDosya, setSecilenDosya] = useState<string | null>(null);
   const [kapakVar, setKapakVar] = useState(Boolean(duyuru?.kapakUrl));
   const [silmeIslemi, silmeyiBaslat] = useTransition();
 
@@ -207,22 +207,11 @@ export default function DuyuruFormu({ duyuru }: { duyuru?: Duyuru }) {
         )}
 
         <div className="mt-4">
-          <input
-            type="file"
+          <DosyaSecici
             name="kapak"
-            accept="image/jpeg,image/png,image/webp,image/avif"
-            onChange={(e) =>
-              setSecilenDosya(e.target.files?.[0]?.name ?? null)
-            }
-            className="block w-full cursor-pointer rounded-xl border border-dashed border-parsomen-400 bg-parsomen-100 px-4 py-4 text-sm text-murekkep-700 file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-muhur-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-parsomen-50 hover:file:bg-muhur-700"
+            etiket="Kapak Fotoğrafı Seç"
+            ipucu="Tek fotoğraf. Yenisini yüklerseniz eskisi otomatik silinir."
           />
-          {secilenDosya && (
-            <p className="mt-3 text-xs text-murekkep-500">· {secilenDosya}</p>
-          )}
-          <p className="mt-3 text-xs text-murekkep-500">
-            Tek fotoğraf. Yenisini yüklerseniz eskisi otomatik silinir. JPEG,
-            PNG, WebP veya AVIF — en fazla 10 MB.
-          </p>
         </div>
       </div>
 

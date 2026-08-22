@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import DosyaSecici from "@/components/DosyaSecici";
 import { useActionState, useState, useTransition } from "react";
 import { urunGorselSil, urunKaydet, type UrunDurumu } from "./actions";
 
@@ -39,7 +40,6 @@ export default function UrunFormu({
   urun?: Urun;
 }) {
   const [durum, formGonder, bekliyor] = useActionState(urunKaydet, baslangic);
-  const [secilenler, setSecilenler] = useState<string[]>([]);
   const [silmeIslemi, silmeyiBaslat] = useTransition();
 
   // Kategori listeden mi seçilecek, yoksa yenisi mi yazılacak?
@@ -208,31 +208,12 @@ export default function UrunFormu({
         )}
 
         <div className="mt-4">
-          <input
-            type="file"
+          <DosyaSecici
             name="gorseller"
-            multiple
-            accept="image/jpeg,image/png,image/webp,image/avif"
-            onChange={(e) =>
-              setSecilenler(Array.from(e.target.files ?? []).map((f) => f.name))
-            }
-            className="block w-full cursor-pointer rounded-xl border border-dashed border-parsomen-400 bg-parsomen-100 px-4 py-4 text-sm text-murekkep-700 file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-muhur-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-parsomen-50 hover:file:bg-muhur-700"
+            coklu
+            etiket="Fotoğraf Seç"
+            ipucu="İlk fotoğraf ürünün kapağı olur."
           />
-
-          {secilenler.length > 0 && (
-            <ul className="mt-3 space-y-1">
-              {secilenler.map((ad) => (
-                <li key={ad} className="text-xs text-murekkep-500">
-                  · {ad}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <p className="mt-3 text-xs text-murekkep-500">
-            Birden fazla seçebilirsiniz. İlk fotoğraf kapak olur. JPEG, PNG, WebP
-            veya AVIF — dosya başına en fazla 10 MB.
-          </p>
         </div>
       </div>
 
@@ -266,11 +247,6 @@ export default function UrunFormu({
           Vazgeç
         </Link>
 
-        {bekliyor && secilenler.length > 0 && (
-          <span className="text-xs text-murekkep-500">
-            Fotoğraflar yükleniyor, sayfayı kapatmayın...
-          </span>
-        )}
       </div>
     </form>
   );
