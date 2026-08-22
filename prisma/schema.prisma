@@ -129,16 +129,37 @@ enum GaleriTuru {
   DIGER
 }
 
+// Fotoğraflar albümlerde toplanıyor. Düz bir yığın olsaydı üç farklı
+// kermesin fotoğrafları tek duvarda karışırdı; ziyaretçi hangi fotoğrafın
+// hangi etkinlikten olduğunu anlayamazdı.
+model GaleriAlbum {
+  id         String       @id @default(cuid())
+  ad         String
+  slug       String       @unique
+  aciklama   String?
+  tur        GaleriTuru   @default(DIGER)
+  tarih      DateTime?
+  yayinda    Boolean      @default(true)
+  olusturma  DateTime     @default(now())
+  guncelleme DateTime     @updatedAt
+  fotolar    GaleriFoto[]
+
+  @@index([tur])
+}
+
 model GaleriFoto {
-  id        String     @id @default(cuid())
-  tur       GaleriTuru @default(DIGER)
+  id        String      @id @default(cuid())
+  albumId   String
+  album     GaleriAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
   url       String
   publicId  String
   aciklama  String?
-  sira      Int        @default(0)
-  olusturma DateTime   @default(now())
+  genislik  Int?
+  yukseklik Int?
+  sira      Int         @default(0)
+  olusturma DateTime    @default(now())
 
-  @@index([tur])
+  @@index([albumId])
 }
 
 // ============================================================

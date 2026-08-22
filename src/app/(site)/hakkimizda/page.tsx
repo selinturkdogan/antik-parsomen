@@ -12,9 +12,12 @@ export default async function HakkimizdaSayfasi() {
   // İki sorguyu aynı anda çalıştırıyoruz — sırayla beklemek yerine
   const [ayar, fotolar] = await Promise.all([
     prisma.siteAyar.findUnique({ where: { id: "tek" } }),
+    // Atölye ve üretim albümlerinden birkaç fotoğraf
     prisma.galeriFoto.findMany({
-      where: { tur: { in: ["ATOLYE", "URETIM"] } },
-      orderBy: { sira: "asc" },
+      where: {
+        album: { yayinda: true, tur: { in: ["ATOLYE", "URETIM"] } },
+      },
+      orderBy: [{ album: { tarih: "desc" } }, { sira: "asc" }],
       take: 6,
     }),
   ]);
