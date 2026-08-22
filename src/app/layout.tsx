@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+
 
 // Başlıklar için: klasik el yazması havası veren zarif bir serif
 const cormorant = Cormorant_Garamond({
@@ -34,10 +33,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="tr"
       className={`${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
-            <body className="flex min-h-full flex-col bg-parsomen-100 text-murekkep-900">
-        <Header />
-        <div className="flex-1">{children}</div>
-        <Footer />
+                 <body className="flex min-h-full flex-col bg-parsomen-100 text-murekkep-900">
+        {children}
       </body>
     </html>
   );
