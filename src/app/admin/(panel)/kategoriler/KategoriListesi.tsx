@@ -184,18 +184,25 @@ function KategoriSatiri({
             {kategori.ad}
           </button>
         )}
-        <p className="mt-0.5 truncate text-xs text-murekkep-500">
-          /urunler?kategori={kategori.slug}
-        </p>
       </div>
 
       {/* Ürün sayısı */}
-      <Link
-        href={`/admin/urunler`}
-        className="shrink-0 rounded-full bg-parsomen-200 px-3 py-1 text-[11px] text-murekkep-700"
-      >
-        {kategori.urunSayisi} ürün
-      </Link>
+      <span className="shrink-0 rounded-full bg-parsomen-200 px-3 py-1 text-[11px] text-murekkep-700">
+        {kategori.urunSayisi === 0
+          ? "ürün yok"
+          : `${kategori.urunSayisi} ürün`}
+      </span>
+
+      {/* Sitede görüntüle — yalnızca ürünü varsa anlamlı */}
+      {kategori.urunSayisi > 0 && (
+        <Link
+          href={`/urunler?kategori=${kategori.slug}`}
+          target="_blank"
+          className="shrink-0 text-xs text-muhur-600 underline-offset-4 transition hover:underline"
+        >
+          Sitede gör ↗
+        </Link>
+      )}
 
       {/* Sil */}
       <div className="shrink-0">
