@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const menu = [
   { ad: "Kontrol Paneli", yol: "/admin" },
   { ad: "Ürünler", yol: "/admin/urunler" },
+  { ad: "Kategoriler", yol: "/admin/kategoriler" },
   { ad: "Duyurular", yol: "/admin/duyurular" },
   { ad: "Galeri", yol: "/admin/galeri" },
   { ad: "S.S.S.", yol: "/admin/sss" },

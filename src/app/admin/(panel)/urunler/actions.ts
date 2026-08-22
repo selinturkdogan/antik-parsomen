@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { adminGerekli } from "@/lib/yetki";
 import { gorselSil, gorselYukle } from "@/lib/cloudinary";
 import { slugYap } from "@/lib/slug";
+import { kategoriBulVeyaOlustur } from "../kategoriler/actions";
 
 export type UrunDurumu = { hata?: string };
 
@@ -109,16 +110,32 @@ export async function urunKaydet(
   const id = String(formData.get("id") ?? "").trim();
   const ad = String(formData.get("ad") ?? "").trim();
   const aciklama = String(formData.get("aciklama") ?? "").trim();
-  const kategoriId = String(formData.get("kategoriId") ?? "").trim();
+  const secilenKategoriId = String(formData.get("kategoriId") ?? "").trim();
+  const yeniKategoriAdi = String(formData.get("yeniKategori") ?? "").trim();
   const oneCikan = formData.get("oneCikan") === "on";
   const yayinda = formData.get("yayinda") === "on";
 
   if (!ad) return { hata: "Ürün adı gerekli." };
   if (!aciklama) return { hata: "Açıklama gerekli." };
-  if (!kategoriId) return { hata: "Kategori seçin." };
 
-  const kategori = await prisma.kategori.findUnique({ where: { id: kategoriId } });
-  if (!kategori) return { hata: "Seçilen kategori bulunamadı." };
+  // Kategori ya listeden seçilir ya da yeni adı yazılıp burada oluşturulur
+  let kategoriId: string;
+
+  if (yeniKategoriAdi) {
+    try {
+      const kategori = await kategoriBulVeyaOlustur(yeniKategoriAdi);
+      kategoriId = kategori.id;
+    } catch (e) {
+      return { hata: hataMesaji(e) };
+    }
+  } else {
+    if (!secilenKategoriId) return { hata: "Kategori seçin." };
+    const kategori = await prisma.kategori.findUnique({
+      where: { id: secilenKategoriId },
+    });
+    if (!kategori) return { hata: "Seçilen kategori bulunamadı." };
+    kategoriId = kategori.id;
+  }
 
   const dosyalar = formData.getAll("gorseller").filter((d): d is File => d instanceof File);
 

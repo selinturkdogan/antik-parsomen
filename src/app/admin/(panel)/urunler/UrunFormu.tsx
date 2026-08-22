@@ -42,6 +42,10 @@ export default function UrunFormu({
   const [secilenler, setSecilenler] = useState<string[]>([]);
   const [silmeIslemi, silmeyiBaslat] = useTransition();
 
+  // Kategori listeden mi seçilecek, yoksa yenisi mi yazılacak?
+  // Hiç kategori yoksa doğrudan "yeni" moduna açılsın.
+  const [yeniKategoriMi, setYeniKategoriMi] = useState(kategoriler.length === 0);
+
   return (
     <form action={formGonder} className="space-y-7">
       {urun && <input type="hidden" name="id" value={urun.id} />}
@@ -72,25 +76,53 @@ export default function UrunFormu({
         </div>
 
         <div className="mt-6">
-          <label htmlFor="kategoriId" className={etiket}>
-            Kategori
-          </label>
-          <select
-            id="kategoriId"
-            name="kategoriId"
-            required
-            defaultValue={urun?.kategoriId ?? ""}
-            className={kutu}
-          >
-            <option value="" disabled>
-              Kategori seçin...
-            </option>
-            {kategoriler.map((k) => (
-              <option key={k.id} value={k.id}>
-                {k.ad}
+          <div className="flex items-center justify-between gap-3">
+            <label htmlFor={yeniKategoriMi ? "yeniKategori" : "kategoriId"} className={etiket}>
+              Kategori
+            </label>
+            <button
+              type="button"
+              onClick={() => setYeniKategoriMi((v) => !v)}
+              className="text-xs text-muhur-600 underline-offset-4 transition hover:underline"
+            >
+              {yeniKategoriMi ? "Listeden seç" : "+ Yeni kategori oluştur"}
+            </button>
+          </div>
+
+          {yeniKategoriMi ? (
+            <>
+              <input
+                id="yeniKategori"
+                name="yeniKategori"
+                type="text"
+                required
+                placeholder="Örn: Takı, Kitap Ayraçları..."
+                className={kutu}
+              />
+              <p className="mt-2 text-xs text-murekkep-500">
+                Bu kategori kaydedince oluşturulur ve sitedeki filtreye eklenir.
+                Aynı adda bir kategori zaten varsa yenisi açılmaz, mevcut olan
+                kullanılır.
+              </p>
+            </>
+          ) : (
+            <select
+              id="kategoriId"
+              name="kategoriId"
+              required
+              defaultValue={urun?.kategoriId ?? ""}
+              className={kutu}
+            >
+              <option value="" disabled>
+                Kategori seçin...
               </option>
-            ))}
-          </select>
+              {kategoriler.map((k) => (
+                <option key={k.id} value={k.id}>
+                  {k.ad}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         <div className="mt-6">

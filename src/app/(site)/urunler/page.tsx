@@ -15,7 +15,19 @@ export default async function UrunlerSayfasi(props: PageProps<"/urunler">) {
   const kategoriSlug = typeof kategori === "string" ? kategori : "";
 
   const [kategoriler, urunler] = await Promise.all([
-    prisma.kategori.findMany({ orderBy: { sira: "asc" } }),
+    // Filtrede yalnızca içinde yayında ürün olan kategoriler görünsün.
+    // Ziyaretçi boş bir kategoriye tıklayıp "ürün bulunamadı" görmesin.
+    // Seçili kategori boşalmışsa yine de listede kalsın, yoksa
+    // kullanıcının seçtiği düğme birden kaybolur.
+    prisma.kategori.findMany({
+      where: {
+        OR: [
+          { urunler: { some: { yayinda: true } } },
+          ...(kategoriSlug ? [{ slug: kategoriSlug }] : []),
+        ],
+      },
+      orderBy: { sira: "asc" },
+    }),
     prisma.urun.findMany({
       where: {
         yayinda: true,
