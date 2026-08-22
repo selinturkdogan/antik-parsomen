@@ -30,17 +30,18 @@ model Kategori {
 }
 
 model Urun {
-  id         String       @id @default(cuid())
-  ad         String
-  slug       String       @unique
-  aciklama   String
-  kategoriId String
-  kategori   Kategori     @relation(fields: [kategoriId], references: [id])
-  gorseller  UrunGorsel[]
-  oneCikan   Boolean      @default(false) // ana sayfada gösterilsin mi?
-  yayinda    Boolean      @default(true) // false ise siteden gizlenir
-  olusturma  DateTime     @default(now())
-  guncelleme DateTime     @updatedAt
+  id          String         @id @default(cuid())
+  ad          String
+  slug        String         @unique
+  aciklama    String
+  kategoriId  String
+  kategori    Kategori       @relation(fields: [kategoriId], references: [id])
+  gorseller   UrunGorsel[]
+  eskiSluglar UrunEskiSlug[]
+  oneCikan    Boolean        @default(false) // ana sayfada gösterilsin mi?
+  yayinda     Boolean        @default(true) // false ise siteden gizlenir
+  olusturma   DateTime       @default(now())
+  guncelleme  DateTime       @updatedAt
 
   @@index([kategoriId])
   @@index([oneCikan])
@@ -60,7 +61,19 @@ model UrunGorsel {
   genislik  Int?
   yukseklik Int?
 
-  sira     Int     @default(0) // 0 = kapak görseli
+  sira Int @default(0) // 0 = kapak görseli
+
+  @@index([urunId])
+}
+
+// Ürün adı değişince adresi de değişiyor. Eski adresi burada saklayıp
+// yeni adrese yönlendiriyoruz — paylaşılmış bağlantılar kırılmasın.
+model UrunEskiSlug {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  urunId    String
+  urun      Urun     @relation(fields: [urunId], references: [id], onDelete: Cascade)
+  olusturma DateTime @default(now())
 
   @@index([urunId])
 }

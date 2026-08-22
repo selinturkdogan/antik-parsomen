@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    serverActions: {
+      // Varsayılan 1 MB; telefon fotoğrafları bunu rahat aşıyor.
+      // Aynı anda birkaç fotoğraf yüklenebilsin diye geniş tuttuk.
+      bodySizeLimit: "25mb",
+    },
+  },
 };
 
 export default nextConfig;

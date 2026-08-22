@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import UrunGaleri from "@/components/UrunGaleri";
@@ -15,6 +15,21 @@ const urunGetir = cache(async (slug: string) => {
     where: { slug, yayinda: true },
     include: { kategori: true, gorseller: { orderBy: { sira: "asc" } } },
   });
+});
+
+/**
+ * Ürünün adı değişince adresi de değişiyor. Bu adres eskiden bir ürüne
+ * aitse, ziyaretçiyi 404'e düşürmek yerine yeni adrese yolluyoruz.
+ * 308 kalıcı yönlendirme: Google da sıralamayı yeni adrese taşır.
+ */
+const eskiAdresiCoz = cache(async (slug: string) => {
+  const kayit = await prisma.urunEskiSlug.findUnique({
+    where: { slug },
+    include: { urun: { select: { slug: true, yayinda: true } } },
+  });
+
+  if (!kayit || !kayit.urun.yayinda) return null;
+  return kayit.urun.slug;
 });
 
 // Tarayıcı sekmesi, Google sonuçları ve WhatsApp önizlemesi için
@@ -44,7 +59,13 @@ export default async function UrunDetaySayfasi({
   const { slug } = await params;
   const urun = await urunGetir(slug);
 
-  if (!urun) notFound(); // 404 sayfasını göster
+  if (!urun) {
+    // Bu adres eskiden bir ürüne aitse yeni adresine yönlendir
+    const yeniSlug = await eskiAdresiCoz(slug);
+    if (yeniSlug) permanentRedirect(`/urunler/${yeniSlug}`);
+
+    notFound(); // gerçekten yoksa 404
+  }
 
   const [benzerler, ayar] = await Promise.all([
     prisma.urun.findMany({

@@ -21,10 +21,17 @@ cloudinary.config({
  * Bir dosyayı Cloudinary'ye yükler.
  * Geriye görselin adresini ve silmek için gereken kimliğini döner.
  */
+export type YuklenenGorsel = {
+  url: string;
+  publicId: string;
+  genislik: number;
+  yukseklik: number;
+};
+
 export function gorselYukle(
   dosya: Buffer,
   klasor = "antik-parsomen"
-): Promise<{ url: string; publicId: string }> {
+): Promise<YuklenenGorsel> {
   return new Promise((cozumle, reddet) => {
     const akis = cloudinary.uploader.upload_stream(
       { folder: klasor, resource_type: "image" },
@@ -32,7 +39,12 @@ export function gorselYukle(
         if (hata || !sonuc) {
           return reddet(hata ?? new Error("Yükleme başarısız"));
         }
-        cozumle({ url: sonuc.secure_url, publicId: sonuc.public_id });
+        cozumle({
+          url: sonuc.secure_url,
+          publicId: sonuc.public_id,
+          genislik: sonuc.width,
+          yukseklik: sonuc.height,
+        });
       }
     );
     akis.end(dosya);
