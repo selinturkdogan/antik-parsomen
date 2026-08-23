@@ -33,20 +33,22 @@ export default function Header() {
           onClick={() => setMobilAcik(false)}
           className="flex items-center gap-3.5"
         >
-          {/* Arka planı şeffaf PNG: daire kırpma ve karışım hilesine
-              gerek yok, amblem olduğu gibi krem zeminin üstünde duruyor.
-              Mühür aşağı sarktığı için görsel dikey; yüksekliği verip
-              genişliği object-contain'e bırakıyoruz. */}
-          <span className="relative h-14 w-[49px] shrink-0 sm:h-16 sm:w-[56px]">
-            <Image
-              src="/logo.png"
-              alt="Antik Parşömen logosu"
-              fill
-              sizes="64px"
-              priority
-              className="object-contain"
-            />
-          </span>
+          {/* Arka planı şeffaf PNG; amblem olduğu gibi krem zeminin
+              üstünde duruyor.
+
+              `fill` yerine gerçek ölçü veriyoruz: fill, boyutu tamamen
+              CSS'e bırakıyor. Stil dosyası bir sebeple gecikir veya eski
+              sürümü önbellekten gelirse kapsayıcı sıfır genişlikte kalıp
+              logo hiç görünmüyordu. Ölçü etiketin üstünde olunca görsel
+              her hâlükârda çiziliyor. */}
+          <Image
+            src="/logo.png"
+            alt="Antik Parşömen logosu"
+            width={56}
+            height={64}
+            priority
+            className="h-14 w-auto shrink-0 sm:h-16"
+          />
 
           <span className="min-w-0">
             <span className="block font-baslik text-2xl font-semibold leading-none tracking-wide">
