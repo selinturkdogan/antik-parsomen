@@ -72,8 +72,8 @@ export default async function AnaSayfa() {
   return (
     <main>
       {/* ================= KAPAK ================= */}
-      <section className="relative overflow-hidden border-b border-parsomen-300">
-        {kapak && (
+      <section className="relative flex min-h-[70vh] items-end overflow-hidden border-b border-parsomen-300 sm:min-h-[88vh]">
+        {kapak ? (
           <>
             <Image
               src={kapak}
@@ -83,18 +83,25 @@ export default async function AnaSayfa() {
               className="object-cover"
               priority
             />
-            {/* Yazılar okunsun diye koyu perde */}
-            <div className="absolute inset-0 bg-murekkep-900/62" />
+
+            {/* Fotoğraf detaylıysa tek renk perde yazıyı okutmuyor.
+                İki katman kullanıyoruz: geneli hafifçe koyultan bir kat,
+                üstüne yazının bulunduğu alta doğru koyulaşan bir geçiş.
+                Böylece fotoğraf görünür kalıyor, yazı her zaman okunuyor. */}
+            <div className="absolute inset-0 bg-murekkep-900/30" />
+            <div className="absolute inset-0 bg-gradient-to-t from-murekkep-900 via-murekkep-900/70 to-murekkep-900/10" />
           </>
+        ) : (
+          <div className="absolute inset-0 bg-parsomen-100" />
         )}
 
-        <div
-          className={`relative mx-auto max-w-6xl px-6 ${
-            kapak ? "py-32 sm:py-44" : "py-24 sm:py-32"
-          }`}
-        >
+        <div className="relative mx-auto w-full max-w-6xl px-6 pb-16 pt-36 sm:pb-24 sm:pt-48">
+          <div
+            className={`h-px w-16 ${kapak ? "bg-altin-500" : "bg-altin-500/60"}`}
+          />
+
           <p
-            className={`text-[11px] font-semibold uppercase tracking-[0.25em] ${
+            className={`mt-6 text-[11px] font-semibold uppercase tracking-[0.3em] ${
               kapak ? "text-altin-500" : "text-muhur-600"
             }`}
           >
@@ -102,35 +109,51 @@ export default async function AnaSayfa() {
           </p>
 
           <h1
-            className={`mt-5 max-w-3xl font-baslik text-5xl font-semibold leading-tight sm:text-6xl lg:text-7xl ${
-              kapak ? "text-parsomen-50" : "text-murekkep-900"
+            className={`mt-5 max-w-3xl font-baslik text-5xl font-semibold leading-[1.08] sm:text-6xl lg:text-7xl ${
+              kapak
+                ? "text-parsomen-50 [text-shadow:0_2px_28px_rgb(42_33_24_/_0.65)]"
+                : "text-murekkep-900"
             }`}
           >
             {slogan}
           </h1>
 
           <p
-            className={`mt-6 max-w-xl text-lg leading-relaxed ${
-              kapak ? "text-parsomen-50/85" : "text-murekkep-700"
+            className={`mt-7 max-w-xl text-lg leading-relaxed ${
+              kapak ? "text-parsomen-50/90" : "text-murekkep-700"
             }`}
           >
             Her parçası elde hazırlanan parşömenler, hat ve kaligrafi
             çalışmaları, size özel tasarımlar.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-3">
+          <div className="mt-11 flex flex-wrap gap-4">
             <Link
               href="/urunler"
-              className="rounded-xl bg-muhur-600 px-7 py-3.5 text-sm font-medium text-parsomen-50 shadow-kart transition hover:bg-muhur-700"
+              className="group inline-flex items-center gap-2.5 rounded-full bg-muhur-600 px-8 py-4 text-sm font-medium text-parsomen-50 shadow-kart-havada transition duration-300 hover:-translate-y-0.5 hover:bg-muhur-700"
             >
               Ürünleri İncele
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              >
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
             </Link>
+
             <Link
               href="/iletisim"
-              className={`rounded-xl border px-7 py-3.5 text-sm font-medium transition ${
+              className={`inline-flex items-center rounded-full px-8 py-4 text-sm font-medium transition duration-300 hover:-translate-y-0.5 ${
                 kapak
-                  ? "border-parsomen-50/40 text-parsomen-50 hover:bg-parsomen-50/10"
-                  : "border-parsomen-400 text-murekkep-700 hover:bg-parsomen-50"
+                  ? "border border-parsomen-50/35 bg-parsomen-50/10 text-parsomen-50 backdrop-blur-sm hover:border-parsomen-50/60 hover:bg-parsomen-50/20"
+                  : "border border-parsomen-400 bg-parsomen-50 text-murekkep-700 shadow-kart hover:border-muhur-600 hover:text-muhur-600"
               }`}
             >
               İletişime Geç
