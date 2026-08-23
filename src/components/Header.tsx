@@ -33,21 +33,18 @@ export default function Header() {
           onClick={() => setMobilAcik(false)}
           className="flex items-center gap-3.5"
         >
-          {/* Logo dosyası kumaşa basılı logonun fotoğrafı: arka planı
-              şeffaf değil ve kremden turuncuya kayıyor. Kare olarak
-              koyduğumuzda üst şeritte lekeli bir kutu gibi duruyordu.
-              Amblem zaten yuvarlak olduğu için daire olarak kırpıyoruz —
-              köşelerdeki arka plan tamamen kesiliyor, mühür rozeti gibi
-              duruyor. mix-blend-multiply kalan kenar payını krem zemine
-              karıştırıyor. */}
-          <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-parsomen-300 sm:h-14 sm:w-14">
+          {/* Arka planı şeffaf PNG: daire kırpma ve karışım hilesine
+              gerek yok, amblem olduğu gibi krem zeminin üstünde duruyor.
+              Mühür aşağı sarktığı için görsel dikey; yüksekliği verip
+              genişliği object-contain'e bırakıyoruz. */}
+          <span className="relative h-14 w-[49px] shrink-0 sm:h-16 sm:w-[56px]">
             <Image
               src="/logo.png"
               alt="Antik Parşömen logosu"
               fill
-              sizes="56px"
+              sizes="64px"
               priority
-              className="scale-[1.06] object-cover mix-blend-multiply"
+              className="object-contain"
             />
           </span>
 
