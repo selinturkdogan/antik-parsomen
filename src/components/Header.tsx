@@ -42,7 +42,7 @@ export default function Header() {
               logo hiç görünmüyordu. Ölçü etiketin üstünde olunca görsel
               her hâlükârda çiziliyor. */}
           <Image
-            src="/logo.png"
+            src="/antik-parsomen-logo.png"
             alt="Antik Parşömen logosu"
             width={56}
             height={64}
