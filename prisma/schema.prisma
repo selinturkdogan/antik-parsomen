@@ -195,6 +195,13 @@ model SoruCevap {
 model SiteAyar {
   id String @id @default("tek")
 
+  // Ana sayfa kapağı — panelden yüklenip değiştirilebiliyor
+  slogan         String?
+  kapakUrl       String?
+  kapakPublicId  String?
+  kapakGenislik  Int?
+  kapakYukseklik Int?
+
   // İletişim
   telefon  String?
   whatsapp String?

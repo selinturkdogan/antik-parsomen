@@ -1,9 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import { useActionState } from "react";
+import DosyaSecici from "@/components/DosyaSecici";
 import { ayarlariKaydet, type AyarDurumu } from "./actions";
 
 type Ayar = {
+  slogan: string | null;
+  kapakUrl: string | null;
   telefon: string | null;
   whatsapp: string | null;
   email: string | null;
@@ -41,6 +45,53 @@ export default function AyarFormu({ ayar }: { ayar: Ayar | null }) {
 
   return (
     <form action={formGonder} className="space-y-7">
+      {/* ---------- Ana sayfa ---------- */}
+      <Bolum
+        baslik="Ana Sayfa Kapağı"
+        aciklama="Ziyaretçinin siteye girdiğinde ilk gördüğü bölüm."
+      >
+        <div>
+          <label htmlFor="slogan" className={etiket}>
+            Slogan
+          </label>
+          <input
+            id="slogan"
+            name="slogan"
+            type="text"
+            defaultValue={ayar?.slogan ?? ""}
+            placeholder="El Yapımı Parşömen Sanatı ve Kişiye Özel Tasarımlar"
+            className={kutu}
+          />
+          <p className={yardim}>
+            Boş bırakırsanız varsayılan slogan kullanılır.
+          </p>
+        </div>
+
+        <div className="mt-6">
+          <p className={etiket}>Kapak fotoğrafı</p>
+
+          {ayar?.kapakUrl && (
+            <div className="relative mt-3 h-44 w-full overflow-hidden rounded-xl border border-parsomen-300 bg-parsomen-200 sm:w-96">
+              <Image
+                src={ayar.kapakUrl}
+                alt="Mevcut kapak"
+                fill
+                sizes="384px"
+                className="object-cover"
+              />
+            </div>
+          )}
+
+          <div className="mt-3">
+            <DosyaSecici
+              name="kapak"
+              etiket={ayar?.kapakUrl ? "Kapağı Değiştir" : "Kapak Fotoğrafı Seç"}
+              ipucu="Yatay ve geniş bir fotoğraf en iyi sonucu verir. Yenisini yüklerseniz eskisi otomatik silinir. Kapak yoksa ana sayfa yazıyla açılır."
+            />
+          </div>
+        </div>
+      </Bolum>
+
       {/* ---------- İletişim ---------- */}
       <Bolum
         baslik="İletişim Bilgileri"

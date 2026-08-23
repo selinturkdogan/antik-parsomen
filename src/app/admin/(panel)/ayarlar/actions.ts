@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { adminGerekli } from "@/lib/yetki";
+import { gorselSil, gorselYukle } from "@/lib/cloudinary";
 
 export type AyarDurumu = { hata?: string; basari?: boolean };
 
@@ -38,6 +39,9 @@ function bosaNull(deger: FormDataEntryValue | null): string | null {
   return s || null;
 }
 
+const MAKS_DOSYA = 10 * 1024 * 1024; // 10 MB
+const IZINLI_TURLER = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+
 export async function ayarlariKaydet(
   _oncekiDurum: AyarDurumu,
   formData: FormData
@@ -54,7 +58,55 @@ export async function ayarlariKaydet(
     return { hata: "Google Maps bağlantısı https:// ile başlamalı." };
   }
 
+  // ---- Ana sayfa kapağı ----
+  const mevcut = await prisma.siteAyar.findUnique({ where: { id: "tek" } });
+
+  let kapakUrl = mevcut?.kapakUrl ?? null;
+  let kapakPublicId = mevcut?.kapakPublicId ?? null;
+  let kapakGenislik = mevcut?.kapakGenislik ?? null;
+  let kapakYukseklik = mevcut?.kapakYukseklik ?? null;
+
+  const kapakDosyasi = formData.get("kapak");
+
+  if (kapakDosyasi instanceof File && kapakDosyasi.size > 0) {
+    if (!IZINLI_TURLER.includes(kapakDosyasi.type)) {
+      return { hata: "Kapak için JPEG, PNG, WebP veya AVIF yükleyin." };
+    }
+    if (kapakDosyasi.size > MAKS_DOSYA) {
+      return { hata: "Kapak fotoğrafı en fazla 10 MB olmalı." };
+    }
+
+    try {
+      const tampon = Buffer.from(await kapakDosyasi.arrayBuffer());
+      const yuklenen = await gorselYukle(tampon, "antik-parsomen/site");
+
+      // Yeni kapak geldiyse eskisi Cloudinary'de çöp kalmasın
+      if (kapakPublicId) {
+        try {
+          await gorselSil(kapakPublicId);
+        } catch {
+          // zaten yoksa sorun değil
+        }
+      }
+
+      kapakUrl = yuklenen.url;
+      kapakPublicId = yuklenen.publicId;
+      kapakGenislik = yuklenen.genislik;
+      kapakYukseklik = yuklenen.yukseklik;
+    } catch (e) {
+      console.error("kapak yükleme hatası:", e);
+      return { hata: "Kapak fotoğrafı yüklenemedi. Lütfen tekrar deneyin." };
+    }
+  }
+
   const veri = {
+    // Ana sayfa
+    slogan: bosaNull(formData.get("slogan")),
+    kapakUrl,
+    kapakPublicId,
+    kapakGenislik,
+    kapakYukseklik,
+
     // İletişim
     telefon: bosaNull(formData.get("telefon")),
     whatsapp: whatsappNumarasi(String(formData.get("whatsapp") ?? "")),
