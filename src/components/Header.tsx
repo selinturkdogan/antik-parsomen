@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -25,14 +26,38 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-parsomen-300 bg-parsomen-50/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
-        {/* Logo / site adı */}
-        <Link href="/" onClick={() => setMobilAcik(false)}>
-          <span className="block font-baslik text-2xl font-semibold leading-none tracking-wide">
-            Antik Parşömen
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3.5">
+        {/* Logo + site adı */}
+        <Link
+          href="/"
+          onClick={() => setMobilAcik(false)}
+          className="flex items-center gap-3.5"
+        >
+          {/* Logo dosyası kumaşa basılı logonun fotoğrafı: arka planı
+              şeffaf değil ve kremden turuncuya kayıyor. Kare olarak
+              koyduğumuzda üst şeritte lekeli bir kutu gibi duruyordu.
+              Amblem zaten yuvarlak olduğu için daire olarak kırpıyoruz —
+              köşelerdeki arka plan tamamen kesiliyor, mühür rozeti gibi
+              duruyor. mix-blend-multiply kalan kenar payını krem zemine
+              karıştırıyor. */}
+          <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-parsomen-300 sm:h-14 sm:w-14">
+            <Image
+              src="/logo.png"
+              alt="Antik Parşömen logosu"
+              fill
+              sizes="56px"
+              priority
+              className="scale-[1.06] object-cover mix-blend-multiply"
+            />
           </span>
-          <span className="mt-1 block text-[10px] uppercase tracking-[0.25em] text-altin-500">
-            El Yapımı Parşömen Sanatı
+
+          <span className="min-w-0">
+            <span className="block font-baslik text-2xl font-semibold leading-none tracking-wide">
+              Antik Parşömen
+            </span>
+            <span className="mt-1 block text-[10px] uppercase tracking-[0.25em] text-altin-500">
+              El Yapımı Parşömen Sanatı
+            </span>
           </span>
         </Link>
 
