@@ -34,6 +34,19 @@ function whatsappNumarasi(deger: string): string | null {
   return `90${rakamlar}`;
 }
 
+/**
+ * Yakalanan hatadan okunabilir mesaj çıkarır.
+ * Genel bir "kaydedilemedi" mesajı gerçek sebebi gizliyor ve teşhisi
+ * imkânsızlaştırıyordu.
+ */
+function hataMesaji(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "object" && e !== null && "message" in e) {
+    return String((e as { message: unknown }).message);
+  }
+  return "Kaydedilemedi. Lütfen tekrar deneyin.";
+}
+
 function bosaNull(deger: FormDataEntryValue | null): string | null {
   const s = String(deger ?? "").trim();
   return s || null;
@@ -143,7 +156,7 @@ export async function ayarlariKaydet(
     });
   } catch (e) {
     console.error("ayarlariKaydet hatası:", e);
-    return { hata: "Kaydedilemedi. Lütfen tekrar deneyin." };
+    return { hata: hataMesaji(e) };
   }
 
   // Bu bilgiler sitenin her yerinde kullanılıyor
