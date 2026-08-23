@@ -17,10 +17,14 @@ export default function MesajKarti({ mesaj }: { mesaj: Mesaj }) {
   const [acik, setAcik] = useState(!mesaj.okundu);
   const [bekliyor, baslat] = useTransition();
   const [onayIstendi, setOnayIstendi] = useState(false);
+  const [kopyalandi, setKopyalandi] = useState(false);
 
-  const yanitBaglantisi = `mailto:${mesaj.email}?subject=${encodeURIComponent(
-    `Re: ${mesaj.konu}`
-  )}`;
+  // Mail uygulaması yerine Gmail'in web arayüzü: herkeste kurulu bir
+  // mail programı olmayabiliyor, tarayıcıdan yanıtlamak her zaman çalışır.
+  const yanitBaglantisi =
+    `https://mail.google.com/mail/?view=cm&fs=1` +
+    `&to=${encodeURIComponent(mesaj.email)}` +
+    `&su=${encodeURIComponent(`Re: ${mesaj.konu}`)}`;
 
   return (
     <li
@@ -93,28 +97,48 @@ export default function MesajKarti({ mesaj }: { mesaj: Mesaj }) {
             {mesaj.icerik}
           </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-parsomen-200 pt-4">
-            <a
-              href={yanitBaglantisi}
-              className="rounded-lg bg-muhur-600 px-4 py-2 text-xs font-medium text-parsomen-50 transition hover:bg-muhur-700"
-            >
-              E-posta ile yanıtla
-            </a>
+          <div className="mt-6 border-t border-parsomen-200 pt-5">
+            {/* Üst satır: yanıtlama */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+              <a
+                href={yanitBaglantisi}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg bg-muhur-600 px-4 py-2.5 text-xs font-medium text-parsomen-50 transition hover:bg-muhur-700"
+              >
+                Gmail ile yanıtla ↗
+              </a>
 
-            <span className="text-xs text-murekkep-500">{mesaj.email}</span>
+              <span className="text-xs text-murekkep-500">{mesaj.email}</span>
 
-            <button
-              type="button"
-              disabled={bekliyor}
-              onClick={() =>
-                baslat(() => okunduDegistir(mesaj.id, !mesaj.okundu))
-              }
-              className="text-xs text-murekkep-500 underline-offset-4 transition hover:text-muhur-600 hover:underline disabled:opacity-50"
-            >
-              {mesaj.okundu ? "Okunmadı olarak işaretle" : "Okundu olarak işaretle"}
-            </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard?.writeText(mesaj.email);
+                  setKopyalandi(true);
+                  setTimeout(() => setKopyalandi(false), 2000);
+                }}
+                className="text-xs text-murekkep-500 underline-offset-4 transition hover:text-muhur-600 hover:underline"
+              >
+                {kopyalandi ? "Kopyalandı ✓" : "Adresi kopyala"}
+              </button>
+            </div>
 
-            <span className="ml-auto">
+            {/* Alt satır: durum ve silme — yanıtlamadan ayrı dursun */}
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-x-5 gap-y-3">
+              <button
+                type="button"
+                disabled={bekliyor}
+                onClick={() =>
+                  baslat(() => okunduDegistir(mesaj.id, !mesaj.okundu))
+                }
+                className="text-xs text-murekkep-500 underline-offset-4 transition hover:text-muhur-600 hover:underline disabled:opacity-50"
+              >
+                {mesaj.okundu
+                  ? "Okunmadı olarak işaretle"
+                  : "Okundu olarak işaretle"}
+              </button>
+
               {!onayIstendi ? (
                 <button
                   type="button"
@@ -124,8 +148,10 @@ export default function MesajKarti({ mesaj }: { mesaj: Mesaj }) {
                   Sil
                 </button>
               ) : (
-                <span className="inline-flex items-center gap-2">
-                  <span className="text-xs text-murekkep-700">Silinsin mi?</span>
+                <span className="inline-flex items-center gap-2.5">
+                  <span className="text-xs text-murekkep-700">
+                    Silinsin mi?
+                  </span>
                   <button
                     type="button"
                     disabled={bekliyor}
@@ -143,7 +169,7 @@ export default function MesajKarti({ mesaj }: { mesaj: Mesaj }) {
                   </button>
                 </span>
               )}
-            </span>
+            </div>
           </div>
         </div>
       )}

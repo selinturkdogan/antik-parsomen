@@ -11,6 +11,20 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Gmail'in web arayüzünde yeni ileti açar.
+ * mailto: kullanmıyoruz: ziyaretçinin bilgisayarında kurulu bir mail
+ * programı olmayabiliyor, o zaman bağlantı hiçbir şey yapmıyor.
+ * Tarayıcı üzerinden yazmak herkeste çalışır.
+ */
+function gmailBaglantisi(adres: string) {
+  return (
+    "https://mail.google.com/mail/?view=cm&fs=1" +
+    `&to=${encodeURIComponent(adres)}` +
+    `&su=${encodeURIComponent("Antik Parşömen — Bilgi talebi")}`
+  );
+}
+
 /** "0532 111 22 33" → "tel:+905321112233" */
 function telefonBaglantisi(numara: string) {
   const rakamlar = numara.replace(/\D/g, "");
@@ -106,10 +120,11 @@ export default async function IletisimSayfasi() {
 
         {ayar?.email?.trim() && (
           <HizliKart
-            href={`mailto:${ayar.email}?subject=${encodeURIComponent("Antik Parşömen — Bilgi talebi")}`}
+            href={gmailBaglantisi(ayar.email)}
+            dis
             baslik="E-posta"
             deger={ayar.email}
-            aciklama="Mail programınız açılır"
+            aciklama="Tarayıcıdan yazın"
             ikon={
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2.5" y="4.5" width="19" height="15" rx="2.5" />
@@ -137,27 +152,51 @@ export default async function IletisimSayfasi() {
               {adres && (
                 <Satir baslik="Adres">
                   <span className="whitespace-pre-line">{adres}</span>
-                  {haritaAcilis && (
-                    <a
-                      href={haritaAcilis}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-1.5 block text-sm text-muhur-600 underline-offset-4 transition hover:underline"
-                    >
-                      Yol tarifi al ↗
-                    </a>
-                  )}
-                </Satir>
-              )}
-
-              {ayar?.calismaSaatleri?.trim() && (
-                <Satir baslik="Çalışma saatleri">
-                  <span className="whitespace-pre-line">
-                    {ayar.calismaSaatleri}
-                  </span>
                 </Satir>
               )}
             </dl>
+
+            {/* Harita doğrudan adresin altında — yazılı bağlantı yerine
+                konumun kendisi görünüyor. Tıklayınca Maps'te açılıyor. */}
+            {haritaGomme && (
+              <div className="mt-5">
+                <div className="overflow-hidden rounded-xl border border-parsomen-300">
+                  <iframe
+                    src={haritaGomme}
+                    title="Antik Parşömen konumu"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="block h-[260px] w-full border-0"
+                  />
+                </div>
+
+                {haritaAcilis && (
+                  <a
+                    href={haritaAcilis}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-parsomen-400 px-4 py-2.5 text-sm text-murekkep-700 transition hover:border-muhur-600 hover:text-muhur-600"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    Google Maps&apos;te aç ↗
+                  </a>
+                )}
+              </div>
+            )}
+
+            {ayar?.calismaSaatleri?.trim() && (
+              <div className="mt-6 border-t border-parsomen-200 pt-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-murekkep-500">
+                  Çalışma saatleri
+                </p>
+                <p className="mt-1.5 whitespace-pre-line leading-relaxed text-murekkep-900">
+                  {ayar.calismaSaatleri}
+                </p>
+              </div>
+            )}
 
             {sosyal.length > 0 && (
               <div className="mt-7 border-t border-parsomen-200 pt-6">
@@ -200,33 +239,6 @@ export default async function IletisimSayfasi() {
         </div>
       </div>
 
-      {/* ---------- Harita ---------- */}
-      {haritaGomme && (
-        <section className="mt-14">
-          <h2 className="font-baslik text-3xl font-semibold">Konumumuz</h2>
-
-          <div className="mt-6 overflow-hidden rounded-2xl border border-parsomen-300 shadow-kart">
-            <iframe
-              src={haritaGomme}
-              title="Antik Parşömen konumu"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="block h-[380px] w-full border-0 sm:h-[440px]"
-            />
-          </div>
-
-          {haritaAcilis && (
-            <a
-              href={haritaAcilis}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 inline-block rounded-xl bg-muhur-600 px-6 py-3 text-sm font-medium text-parsomen-50 shadow-kart transition hover:bg-muhur-700"
-            >
-              Google Maps&apos;te Aç ↗
-            </a>
-          )}
-        </section>
-      )}
     </main>
   );
 }
