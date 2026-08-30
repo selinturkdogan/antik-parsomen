@@ -55,45 +55,6 @@ function bosaNull(deger: FormDataEntryValue | null): string | null {
 const MAKS_DOSYA = 10 * 1024 * 1024; // 10 MB
 const IZINLI_TURLER = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
-/**
- * Formdaki tek bir görsel alanını işler.
- * Yeni dosya geldiyse yükler ve eskisini Cloudinary'den siler;
- * gelmediyse mevcut değerleri olduğu gibi döndürür.
- */
-async function gorselAlani(
-  formData: FormData,
-  alanAdi: string,
-  klasor: string,
-  mevcutUrl: string | null,
-  mevcutPublicId: string | null
-) {
-  const dosya = formData.get(alanAdi);
-
-  if (!(dosya instanceof File) || dosya.size === 0) {
-    return { url: mevcutUrl, publicId: mevcutPublicId, yeni: null };
-  }
-
-  if (!IZINLI_TURLER.includes(dosya.type)) {
-    throw new Error("Fotoğraf için JPEG, PNG, WebP veya AVIF yükleyin.");
-  }
-  if (dosya.size > MAKS_DOSYA) {
-    throw new Error("Fotoğraf en fazla 10 MB olmalı.");
-  }
-
-  const tampon = Buffer.from(await dosya.arrayBuffer());
-  const yuklenen = await gorselYukle(tampon, klasor);
-
-  if (mevcutPublicId) {
-    try {
-      await gorselSil(mevcutPublicId);
-    } catch {
-      // Cloudinary'de zaten yoksa kaydı engellemesin
-    }
-  }
-
-  return { url: yuklenen.url, publicId: yuklenen.publicId, yeni: yuklenen };
-}
-
 export async function ayarlariKaydet(
   _oncekiDurum: AyarDurumu,
   formData: FormData
@@ -198,23 +159,6 @@ export async function ayarlariKaydet(
     return { hata: hataMesaji(e) };
   }
 
-  let sahipFotoUrl = mevcut?.sahipFotoUrl ?? null;
-  let sahipFotoPublicId = mevcut?.sahipFotoPublicId ?? null;
-
-  try {
-    const sonuc = await gorselAlani(
-      formData,
-      "sahipFoto",
-      "antik-parsomen/site",
-      sahipFotoUrl,
-      sahipFotoPublicId
-    );
-    sahipFotoUrl = sonuc.url;
-    sahipFotoPublicId = sonuc.publicId;
-  } catch (e) {
-    return { hata: hataMesaji(e) };
-  }
-
   const veri = {
     // Ana sayfa
     slogan: bosaNull(formData.get("slogan")),
@@ -247,8 +191,6 @@ export async function ayarlariKaydet(
 
     // Hakkımızda
     sahipAdi: bosaNull(formData.get("sahipAdi")),
-    sahipFotoUrl,
-    sahipFotoPublicId,
     sahipFotoUrl,
     sahipFotoPublicId,
     sahipBiyografi: bosaNull(formData.get("sahipBiyografi")),
