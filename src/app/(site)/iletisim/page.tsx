@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import EpostaKarti from "@/components/EpostaKarti";
 import IletisimFormu from "./IletisimFormu";
 
 export const metadata: Metadata = {
@@ -127,20 +128,7 @@ export default async function IletisimSayfasi() {
           />
         )}
 
-        {ayar?.email?.trim() && (
-          <HizliKart
-            href={mailtoBaglantisi(ayar.email)}
-            baslik="E-posta"
-            deger={ayar.email}
-            aciklama="Yazma ekranı açılır"
-            ikon={
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2.5" y="4.5" width="19" height="15" rx="2.5" />
-                <path d="M3 7l9 6 9-6" />
-              </svg>
-            }
-          />
-        )}
+        {ayar?.email?.trim() && <EpostaKarti adres={ayar.email} />}
       </section>
 
       {/* ---------- Bilgiler + Form ---------- */}
@@ -165,14 +153,22 @@ export default async function IletisimSayfasi() {
                   >
                     {ayar.email}
                   </a>
-                  <a
-                    href={gmailBaglantisi(ayar.email)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-1.5 block text-sm text-muhur-600 underline-offset-4 transition hover:underline"
-                  >
-                    Gmail&apos;de yaz ↗
-                  </a>
+                  <span className="mt-1.5 flex flex-wrap gap-x-4 text-sm">
+                    <a
+                      href={gmailBaglantisi(ayar.email)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muhur-600 underline-offset-4 transition hover:underline"
+                    >
+                      Gmail&apos;de yaz ↗
+                    </a>
+                    <a
+                      href={mailtoBaglantisi(ayar.email)}
+                      className="text-murekkep-500 underline-offset-4 transition hover:text-muhur-600 hover:underline"
+                    >
+                      Mail uygulamasında yaz
+                    </a>
+                  </span>
                 </Satir>
               )}
 
