@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useTelefonMu } from "@/lib/cihaz";
 
 const KONU = "Antik Parşömen — Bilgi talebi";
 
@@ -20,13 +20,7 @@ const KONU = "Antik Parşömen — Bilgi talebi";
  * böylece sunucu ve tarayıcı çıktısı ilk anda uyuşuyor.
  */
 export default function EpostaKarti({ adres }: { adres: string }) {
-  const [telefon, setTelefon] = useState(false);
-
-  useEffect(() => {
-    const kucukEkran = window.matchMedia("(max-width: 820px)").matches;
-    const dokunmatik = window.matchMedia("(pointer: coarse)").matches;
-    setTelefon(kucukEkran && dokunmatik);
-  }, []);
+  const telefon = useTelefonMu();
 
   const mailto = `mailto:${adres}?subject=${encodeURIComponent(KONU)}`;
   const gmail =

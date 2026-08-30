@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTelefonMu } from "@/lib/cihaz";
 import { mesajSil, okunduDegistir } from "./actions";
 
 type Mesaj = {
@@ -25,6 +26,7 @@ export default function MesajKarti({
   const [bekliyor, baslat] = useTransition();
   const [onayIstendi, setOnayIstendi] = useState(false);
   const [kopyalandi, setKopyalandi] = useState(false);
+  const telefon = useTelefonMu();
 
   const konu = encodeURIComponent(`Re: ${mesaj.konu}`);
   const alici = encodeURIComponent(mesaj.email);
@@ -41,9 +43,14 @@ export default function MesajKarti({
     `https://mail.google.com/mail/u/${yoneticiEposta}/` +
     `?view=cm&fs=1&to=${alici}&su=${konu}`;
 
-  // Telefonlarda Gmail adresi uygulama tarafından yakalanıp gelen kutusuna
-  // düşüyor; mailto orada yazma ekranını doğrudan açıyor.
+  // Telefonda Gmail'in web arayüzü sıkışık bir form olarak açılıyor;
+  // mailto ise Gmail uygulamasının kendi yazma ekranını getiriyor.
   const mailtoBaglantisi = `mailto:${mesaj.email}?subject=${konu}`;
+
+  const anaHedef = telefon ? mailtoBaglantisi : gmailBaglantisi;
+  const anaEtiket = telefon ? "Yanıtla" : "Gmail ile yanıtla ↗";
+  const ikinciHedef = telefon ? gmailBaglantisi : mailtoBaglantisi;
+  const ikinciEtiket = telefon ? "Tarayıcıda aç" : "Mail uygulamasıyla";
 
   return (
     <li
@@ -120,19 +127,23 @@ export default function MesajKarti({
             {/* Üst satır: yanıtlama */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
               <a
-                href={gmailBaglantisi}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={anaHedef}
+                {...(telefon
+                  ? {}
+                  : { target: "_blank", rel: "noopener noreferrer" })}
                 className="rounded-lg bg-muhur-600 px-4 py-2.5 text-xs font-medium text-parsomen-50 transition hover:bg-muhur-700"
               >
-                Gmail ile yanıtla ↗
+                {anaEtiket}
               </a>
 
               <a
-                href={mailtoBaglantisi}
+                href={ikinciHedef}
+                {...(telefon
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 className="text-xs text-murekkep-500 underline-offset-4 transition hover:text-muhur-600 hover:underline"
               >
-                Mail uygulamasıyla
+                {ikinciEtiket}
               </a>
 
               <span className="text-xs text-murekkep-500">{mesaj.email}</span>
