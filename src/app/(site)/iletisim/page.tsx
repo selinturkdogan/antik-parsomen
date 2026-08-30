@@ -153,22 +153,14 @@ export default async function IletisimSayfasi() {
                   >
                     {ayar.email}
                   </a>
-                  <span className="mt-1.5 flex flex-wrap gap-x-4 text-sm">
-                    <a
-                      href={gmailBaglantisi(ayar.email)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muhur-600 underline-offset-4 transition hover:underline"
-                    >
-                      Gmail&apos;de yaz ↗
-                    </a>
-                    <a
-                      href={mailtoBaglantisi(ayar.email)}
-                      className="text-murekkep-500 underline-offset-4 transition hover:text-muhur-600 hover:underline"
-                    >
-                      Mail uygulamasında yaz
-                    </a>
-                  </span>
+                  <a
+                    href={gmailBaglantisi(ayar.email)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1.5 block text-sm text-muhur-600 underline-offset-4 transition hover:underline"
+                  >
+                    Gmail&apos;de yaz ↗
+                  </a>
                 </Satir>
               )}
 

@@ -47,10 +47,10 @@ export default function MesajKarti({
   // mailto ise Gmail uygulamasının kendi yazma ekranını getiriyor.
   const mailtoBaglantisi = `mailto:${mesaj.email}?subject=${konu}`;
 
+  // Telefonda mailto, telefonun varsayılan mail uygulamasını açıyor —
+  // dükkanda o Gmail olduğu için Gmail'in kendi yazma ekranı geliyor.
+  // Masaüstünde Gmail'in web arayüzü kullanılıyor.
   const anaHedef = telefon ? mailtoBaglantisi : gmailBaglantisi;
-  const anaEtiket = telefon ? "Yanıtla" : "Gmail ile yanıtla ↗";
-  const ikinciHedef = telefon ? gmailBaglantisi : mailtoBaglantisi;
-  const ikinciEtiket = telefon ? "Tarayıcıda aç" : "Mail uygulamasıyla";
 
   return (
     <li
@@ -133,17 +133,7 @@ export default function MesajKarti({
                   : { target: "_blank", rel: "noopener noreferrer" })}
                 className="rounded-lg bg-muhur-600 px-4 py-2.5 text-xs font-medium text-parsomen-50 transition hover:bg-muhur-700"
               >
-                {anaEtiket}
-              </a>
-
-              <a
-                href={ikinciHedef}
-                {...(telefon
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-                className="text-xs text-murekkep-500 underline-offset-4 transition hover:text-muhur-600 hover:underline"
-              >
-                {ikinciEtiket}
+                Gmail ile yanıtla{telefon ? "" : " ↗"}
               </a>
 
               <span className="text-xs text-murekkep-500">{mesaj.email}</span>
