@@ -16,8 +16,13 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       // Varsayılan 1 MB; telefon fotoğrafları bunu rahat aşıyor.
-      // Aynı anda birkaç fotoğraf yüklenebilsin diye geniş tuttuk.
-      bodySizeLimit: "25mb",
+      //
+      // Not: Vercel'de asıl sınır platformun kendisinde — istek gövdesi
+      // 4.5 MB'ı aşarsa istek Next.js'e hiç ulaşmadan 413 ile reddediliyor.
+      // Bu yüzden fotoğraflar tarayıcıda, gönderilmeden önce küçültülüyor
+      // (src/components/DosyaSecici.tsx). Buradaki değer yalnızca yerel
+      // geliştirmede ve küçültmenin çalışmadığı durumlarda pay bırakıyor.
+      bodySizeLimit: "8mb",
     },
   },
 
