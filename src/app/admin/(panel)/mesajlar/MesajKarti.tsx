@@ -33,8 +33,12 @@ export default function MesajKarti({
   // yanıt penceresi varsayılan hesapta değil, dükkanın hesabında açılsın.
   // Yolda hesap belirtilmezse Gmail /u/0 (ilk hesap) kullanıyor ve yanıt
   // yanlış adresten gidiyordu.
+  //
+  // E-postayı burada KODLAMIYORUZ: "@" karakteri adres yolunda geçerli ve
+  // Gmail düz hâlini bekliyor. encodeURIComponent ile "%40" yaptığımızda
+  // hesabı tanımayıp yine varsayılana düşüyor.
   const gmailBaglantisi =
-    `https://mail.google.com/mail/u/${encodeURIComponent(yoneticiEposta)}/` +
+    `https://mail.google.com/mail/u/${yoneticiEposta}/` +
     `?view=cm&fs=1&to=${alici}&su=${konu}`;
 
   // Telefonlarda Gmail adresi uygulama tarafından yakalanıp gelen kutusuna
