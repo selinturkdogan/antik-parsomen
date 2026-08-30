@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Gelen Mesajlar" };
 export const dynamic = "force-dynamic";
 
 export default async function MesajlarSayfasi() {
-  await adminGerekli();
+  const oturum = await adminGerekli();
 
   const mesajlar = await prisma.mesaj.findMany({
     orderBy: { olusturma: "desc" },
@@ -59,6 +59,7 @@ export default async function MesajlarSayfasi() {
           {mesajlar.map((m) => (
             <MesajKarti
               key={m.id}
+              yoneticiEposta={oturum.email}
               mesaj={{
                 id: m.id,
                 adSoyad: m.adSoyad,

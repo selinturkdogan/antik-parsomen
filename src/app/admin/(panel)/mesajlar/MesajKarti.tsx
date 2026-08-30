@@ -13,18 +13,33 @@ type Mesaj = {
   tarihYazisi: string;
 };
 
-export default function MesajKarti({ mesaj }: { mesaj: Mesaj }) {
+export default function MesajKarti({
+  mesaj,
+  yoneticiEposta,
+}: {
+  mesaj: Mesaj;
+  /** Oturumdaki yöneticinin adresi — Gmail'in doğru hesapta açılması için */
+  yoneticiEposta: string;
+}) {
   const [acik, setAcik] = useState(!mesaj.okundu);
   const [bekliyor, baslat] = useTransition();
   const [onayIstendi, setOnayIstendi] = useState(false);
   const [kopyalandi, setKopyalandi] = useState(false);
 
-  // Mail uygulaması yerine Gmail'in web arayüzü: herkeste kurulu bir
-  // mail programı olmayabiliyor, tarayıcıdan yanıtlamak her zaman çalışır.
-  const yanitBaglantisi =
-    `https://mail.google.com/mail/?view=cm&fs=1` +
-    `&to=${encodeURIComponent(mesaj.email)}` +
-    `&su=${encodeURIComponent(`Re: ${mesaj.konu}`)}`;
+  const konu = encodeURIComponent(`Re: ${mesaj.konu}`);
+  const alici = encodeURIComponent(mesaj.email);
+
+  // Adres yolun içinde: Gmail'de birden fazla hesapla oturum açıksa
+  // yanıt penceresi varsayılan hesapta değil, dükkanın hesabında açılsın.
+  // Yolda hesap belirtilmezse Gmail /u/0 (ilk hesap) kullanıyor ve yanıt
+  // yanlış adresten gidiyordu.
+  const gmailBaglantisi =
+    `https://mail.google.com/mail/u/${encodeURIComponent(yoneticiEposta)}/` +
+    `?view=cm&fs=1&to=${alici}&su=${konu}`;
+
+  // Telefonlarda Gmail adresi uygulama tarafından yakalanıp gelen kutusuna
+  // düşüyor; mailto orada yazma ekranını doğrudan açıyor.
+  const mailtoBaglantisi = `mailto:${mesaj.email}?subject=${konu}`;
 
   return (
     <li
@@ -101,12 +116,19 @@ export default function MesajKarti({ mesaj }: { mesaj: Mesaj }) {
             {/* Üst satır: yanıtlama */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
               <a
-                href={yanitBaglantisi}
+                href={gmailBaglantisi}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-lg bg-muhur-600 px-4 py-2.5 text-xs font-medium text-parsomen-50 transition hover:bg-muhur-700"
               >
                 Gmail ile yanıtla ↗
+              </a>
+
+              <a
+                href={mailtoBaglantisi}
+                className="text-xs text-murekkep-500 underline-offset-4 transition hover:text-muhur-600 hover:underline"
+              >
+                Mail uygulamasıyla
               </a>
 
               <span className="text-xs text-murekkep-500">{mesaj.email}</span>

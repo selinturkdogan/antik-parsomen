@@ -11,17 +11,26 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
+const EPOSTA_KONUSU = "Antik Parşömen — Bilgi talebi";
+
 /**
- * Gmail'in web arayüzünde yeni ileti açar.
- * mailto: kullanmıyoruz: ziyaretçinin bilgisayarında kurulu bir mail
- * programı olmayabiliyor, o zaman bağlantı hiçbir şey yapmıyor.
- * Tarayıcı üzerinden yazmak herkeste çalışır.
+ * Ana e-posta bağlantısı: mailto.
+ *
+ * Önce Gmail'in web adresini kullanıyorduk ama telefonlarda o adres
+ * Gmail uygulaması tarafından yakalanıyor ve uygulama parametreleri
+ * anlamadığı için yazma ekranı yerine gelen kutusu açılıyordu.
+ * mailto ise telefonda da masaüstünde de doğrudan yazma ekranını açar.
  */
+function mailtoBaglantisi(adres: string) {
+  return `mailto:${adres}?subject=${encodeURIComponent(EPOSTA_KONUSU)}`;
+}
+
+/** Kurulu mail programı olmayan masaüstü kullanıcıları için alternatif. */
 function gmailBaglantisi(adres: string) {
   return (
     "https://mail.google.com/mail/?view=cm&fs=1" +
     `&to=${encodeURIComponent(adres)}` +
-    `&su=${encodeURIComponent("Antik Parşömen — Bilgi talebi")}`
+    `&su=${encodeURIComponent(EPOSTA_KONUSU)}`
   );
 }
 
@@ -120,11 +129,10 @@ export default async function IletisimSayfasi() {
 
         {ayar?.email?.trim() && (
           <HizliKart
-            href={gmailBaglantisi(ayar.email)}
-            dis
+            href={mailtoBaglantisi(ayar.email)}
             baslik="E-posta"
             deger={ayar.email}
-            aciklama="Tarayıcıdan yazın"
+            aciklama="Yazma ekranı açılır"
             ikon={
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2.5" y="4.5" width="19" height="15" rx="2.5" />
@@ -147,6 +155,25 @@ export default async function IletisimSayfasi() {
             <dl className="mt-6 space-y-5">
               {ayar?.sahipAdi?.trim() && (
                 <Satir baslik="Dükkan sahibi">{ayar.sahipAdi}</Satir>
+              )}
+
+              {ayar?.email?.trim() && (
+                <Satir baslik="E-posta">
+                  <a
+                    href={mailtoBaglantisi(ayar.email)}
+                    className="break-all transition hover:text-muhur-600"
+                  >
+                    {ayar.email}
+                  </a>
+                  <a
+                    href={gmailBaglantisi(ayar.email)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1.5 block text-sm text-muhur-600 underline-offset-4 transition hover:underline"
+                  >
+                    Gmail&apos;de yaz ↗
+                  </a>
+                </Satir>
               )}
 
               {adres && (
