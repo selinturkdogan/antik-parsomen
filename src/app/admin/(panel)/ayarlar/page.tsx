@@ -37,6 +37,7 @@ export default async function AyarlarSayfasi() {
             ayar
               ? {
                   slogan: ayar.slogan,
+                  kapakAciklama: ayar.kapakAciklama,
                   kapakUrl: ayar.kapakUrl,
                   telefon: ayar.telefon,
                   whatsapp: ayar.whatsapp,

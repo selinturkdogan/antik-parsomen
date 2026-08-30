@@ -10,6 +10,9 @@ export const dynamic = "force-dynamic";
 const VARSAYILAN_SLOGAN =
   "El Yapımı Parşömen Sanatı ve Kişiye Özel Tasarımlar";
 
+const VARSAYILAN_ACIKLAMA =
+  "Her parçası elde hazırlanan parşömenler, hat ve kaligrafi çalışmaları, size özel tasarımlar.";
+
 export default async function AnaSayfa() {
   const simdi = new Date();
 
@@ -67,6 +70,7 @@ export default async function AnaSayfa() {
   ).slice(0, 3);
 
   const slogan = ayar?.slogan?.trim() || VARSAYILAN_SLOGAN;
+  const kapakAciklama = ayar?.kapakAciklama?.trim() || VARSAYILAN_ACIKLAMA;
   const kapak = ayar?.kapakUrl;
 
   return (
@@ -123,8 +127,7 @@ export default async function AnaSayfa() {
               kapak ? "text-parsomen-50/90" : "text-murekkep-700"
             }`}
           >
-            Her parçası elde hazırlanan parşömenler, hat ve kaligrafi
-            çalışmaları, size özel tasarımlar.
+            {kapakAciklama}
           </p>
 
           <div className="mt-11 flex flex-wrap gap-4">

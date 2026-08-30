@@ -115,6 +115,7 @@ export async function ayarlariKaydet(
   const veri = {
     // Ana sayfa
     slogan: bosaNull(formData.get("slogan")),
+    kapakAciklama: bosaNull(formData.get("kapakAciklama")),
     kapakUrl,
     kapakPublicId,
     kapakGenislik,

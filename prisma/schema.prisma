@@ -197,6 +197,7 @@ model SiteAyar {
 
   // Ana sayfa kapağı — panelden yüklenip değiştirilebiliyor
   slogan         String?
+  kapakAciklama  String?
   kapakUrl       String?
   kapakPublicId  String?
   kapakGenislik  Int?

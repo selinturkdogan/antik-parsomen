@@ -7,6 +7,7 @@ import { ayarlariKaydet, type AyarDurumu } from "./actions";
 
 type Ayar = {
   slogan: string | null;
+  kapakAciklama: string | null;
   kapakUrl: string | null;
   telefon: string | null;
   whatsapp: string | null;
@@ -64,6 +65,23 @@ export default function AyarFormu({ ayar }: { ayar: Ayar | null }) {
           />
           <p className={yardim}>
             Boş bırakırsanız varsayılan slogan kullanılır.
+          </p>
+        </div>
+
+        <div className="mt-6">
+          <label htmlFor="kapakAciklama" className={etiket}>
+            Slogan altındaki açıklama
+          </label>
+          <textarea
+            id="kapakAciklama"
+            name="kapakAciklama"
+            rows={3}
+            defaultValue={ayar?.kapakAciklama ?? ""}
+            placeholder="Her parçası elde hazırlanan parşömenler, hat ve kaligrafi çalışmaları, size özel tasarımlar."
+            className={`${kutu} resize-y leading-relaxed`}
+          />
+          <p className={yardim}>
+            Sloganın altında, düğmelerin üstünde görünen kısa metin.
           </p>
         </div>
 
