@@ -19,6 +19,7 @@ type Ayar = {
   facebook: string | null;
   youtube: string | null;
   sahipAdi: string | null;
+  sahipFotoUrl: string | null;
   sahipBiyografi: string | null;
   hikaye: string | null;
   malzemeBilgi: string | null;
@@ -266,6 +267,30 @@ export default function AyarFormu({ ayar }: { ayar: Ayar | null }) {
               type="text"
               defaultValue={ayar?.sahipAdi ?? ""}
               className={kutu}
+            />
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <p className={etiket}>Fotoğraf</p>
+
+          {ayar?.sahipFotoUrl && (
+            <div className="relative mt-3 h-28 w-28 overflow-hidden rounded-full border border-parsomen-300 bg-parsomen-200">
+              <Image
+                src={ayar.sahipFotoUrl}
+                alt="Mevcut fotoğraf"
+                fill
+                sizes="112px"
+                className="object-cover"
+              />
+            </div>
+          )}
+
+          <div className="mt-3">
+            <DosyaSecici
+              name="sahipFoto"
+              etiket={ayar?.sahipFotoUrl ? "Fotoğrafı Değiştir" : "Fotoğraf Seç"}
+              ipucu="Hakkımızda sayfasında yuvarlak olarak, adın solunda görünür. Yüzün ortada olduğu bir kare fotoğraf en iyi sonucu verir."
             />
           </div>
         </div>

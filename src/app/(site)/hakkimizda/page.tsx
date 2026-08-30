@@ -41,15 +41,38 @@ export default async function HakkimizdaSayfasi() {
 
       {/* --- Dükkan sahibi --- */}
       {ayar?.sahipAdi && (
-        <section className="mt-12 rounded-lg border border-parsomen-300 bg-parsomen-50 p-8">
-          <h2 className="font-baslik text-3xl font-semibold">
-            {ayar.sahipAdi}
-          </h2>
-          {ayar.sahipBiyografi && (
-            <p className="mt-3 whitespace-pre-line leading-relaxed text-murekkep-700">
-              {ayar.sahipBiyografi}
-            </p>
-          )}
+        <section className="mt-12 rounded-2xl border border-parsomen-300 bg-parsomen-50 p-8 shadow-kart">
+          {/* Fotoğraf solda, metin sağda. Telefonda alt alta geçiyor:
+              dar ekranda yan yana sıkışırlarsa ikisi de okunmuyor. */}
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
+            {ayar.sahipFotoUrl && (
+              <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-full border-2 border-parsomen-300 bg-parsomen-200 shadow-kart sm:h-36 sm:w-36">
+                <Image
+                  src={ayar.sahipFotoUrl}
+                  alt={ayar.sahipAdi}
+                  fill
+                  sizes="144px"
+                  className="object-cover"
+                />
+              </div>
+            )}
+
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-altin-500">
+                Dükkan Sahibi
+              </p>
+
+              <h2 className="mt-2 font-baslik text-3xl font-semibold">
+                {ayar.sahipAdi}
+              </h2>
+
+              {ayar.sahipBiyografi && (
+                <p className="mt-3 whitespace-pre-line leading-relaxed text-murekkep-700">
+                  {ayar.sahipBiyografi}
+                </p>
+              )}
+            </div>
+          </div>
         </section>
       )}
 

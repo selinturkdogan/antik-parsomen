@@ -55,6 +55,45 @@ function bosaNull(deger: FormDataEntryValue | null): string | null {
 const MAKS_DOSYA = 10 * 1024 * 1024; // 10 MB
 const IZINLI_TURLER = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
+/**
+ * Formdaki tek bir görsel alanını işler.
+ * Yeni dosya geldiyse yükler ve eskisini Cloudinary'den siler;
+ * gelmediyse mevcut değerleri olduğu gibi döndürür.
+ */
+async function gorselAlani(
+  formData: FormData,
+  alanAdi: string,
+  klasor: string,
+  mevcutUrl: string | null,
+  mevcutPublicId: string | null
+) {
+  const dosya = formData.get(alanAdi);
+
+  if (!(dosya instanceof File) || dosya.size === 0) {
+    return { url: mevcutUrl, publicId: mevcutPublicId, yeni: null };
+  }
+
+  if (!IZINLI_TURLER.includes(dosya.type)) {
+    throw new Error("Fotoğraf için JPEG, PNG, WebP veya AVIF yükleyin.");
+  }
+  if (dosya.size > MAKS_DOSYA) {
+    throw new Error("Fotoğraf en fazla 10 MB olmalı.");
+  }
+
+  const tampon = Buffer.from(await dosya.arrayBuffer());
+  const yuklenen = await gorselYukle(tampon, klasor);
+
+  if (mevcutPublicId) {
+    try {
+      await gorselSil(mevcutPublicId);
+    } catch {
+      // Cloudinary'de zaten yoksa kaydı engellemesin
+    }
+  }
+
+  return { url: yuklenen.url, publicId: yuklenen.publicId, yeni: yuklenen };
+}
+
 export async function ayarlariKaydet(
   _oncekiDurum: AyarDurumu,
   formData: FormData
@@ -69,6 +108,42 @@ export async function ayarlariKaydet(
   const mapsUrl = String(formData.get("mapsUrl") ?? "").trim();
   if (mapsUrl && !/^https?:\/\//i.test(mapsUrl)) {
     return { hata: "Google Maps bağlantısı https:// ile başlamalı." };
+  }
+
+  /**
+   * Formdan gelen tek bir fotoğrafı yükler.
+   * Yeni dosya gelmediyse mevcut değerleri aynen döndürür; geldiyse
+   * eskisini Cloudinary'den siler ki çöp birikmesin.
+   */
+  async function fotografiIsle(
+    alanAdi: string,
+    eskiUrl: string | null,
+    eskiPublicId: string | null
+  ) {
+    const dosya = formData.get(alanAdi);
+    if (!(dosya instanceof File) || dosya.size === 0) {
+      return { url: eskiUrl, publicId: eskiPublicId, genislik: null as number | null, yukseklik: null as number | null, degisti: false };
+    }
+
+    if (!IZINLI_TURLER.includes(dosya.type)) {
+      throw new Error("Fotoğraf için JPEG, PNG, WebP veya AVIF yükleyin.");
+    }
+    if (dosya.size > MAKS_DOSYA) {
+      throw new Error("Fotoğraf en fazla 10 MB olmalı.");
+    }
+
+    const tampon = Buffer.from(await dosya.arrayBuffer());
+    const yuklenen = await gorselYukle(tampon, "antik-parsomen/site");
+
+    if (eskiPublicId) {
+      try {
+        await gorselSil(eskiPublicId);
+      } catch {
+        // zaten yoksa sorun değil
+      }
+    }
+
+    return { url: yuklenen.url, publicId: yuklenen.publicId, genislik: yuklenen.genislik, yukseklik: yuklenen.yukseklik, degisti: true };
   }
 
   // ---- Ana sayfa kapağı ----
@@ -112,6 +187,34 @@ export async function ayarlariKaydet(
     }
   }
 
+  let sahipFotoUrl = mevcut?.sahipFotoUrl ?? null;
+  let sahipFotoPublicId = mevcut?.sahipFotoPublicId ?? null;
+
+  try {
+    const sonuc = await fotografiIsle("sahipFoto", sahipFotoUrl, sahipFotoPublicId);
+    sahipFotoUrl = sonuc.url;
+    sahipFotoPublicId = sonuc.publicId;
+  } catch (e) {
+    return { hata: hataMesaji(e) };
+  }
+
+  let sahipFotoUrl = mevcut?.sahipFotoUrl ?? null;
+  let sahipFotoPublicId = mevcut?.sahipFotoPublicId ?? null;
+
+  try {
+    const sonuc = await gorselAlani(
+      formData,
+      "sahipFoto",
+      "antik-parsomen/site",
+      sahipFotoUrl,
+      sahipFotoPublicId
+    );
+    sahipFotoUrl = sonuc.url;
+    sahipFotoPublicId = sonuc.publicId;
+  } catch (e) {
+    return { hata: hataMesaji(e) };
+  }
+
   const veri = {
     // Ana sayfa
     slogan: bosaNull(formData.get("slogan")),
@@ -144,6 +247,10 @@ export async function ayarlariKaydet(
 
     // Hakkımızda
     sahipAdi: bosaNull(formData.get("sahipAdi")),
+    sahipFotoUrl,
+    sahipFotoPublicId,
+    sahipFotoUrl,
+    sahipFotoPublicId,
     sahipBiyografi: bosaNull(formData.get("sahipBiyografi")),
     hikaye: bosaNull(formData.get("hikaye")),
     malzemeBilgi: bosaNull(formData.get("malzemeBilgi")),

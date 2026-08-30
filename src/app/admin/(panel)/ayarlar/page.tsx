@@ -49,6 +49,7 @@ export default async function AyarlarSayfasi() {
                   facebook: ayar.facebook,
                   youtube: ayar.youtube,
                   sahipAdi: ayar.sahipAdi,
+                  sahipFotoUrl: ayar.sahipFotoUrl,
                   sahipBiyografi: ayar.sahipBiyografi,
                   hikaye: ayar.hikaye,
                   malzemeBilgi: ayar.malzemeBilgi,

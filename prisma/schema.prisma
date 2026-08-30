@@ -219,10 +219,12 @@ model SiteAyar {
   youtube   String?
 
   // Hakkımızda sayfası metinleri
-  hikaye         String?
-  sahipAdi       String?
-  sahipBiyografi String?
-  malzemeBilgi   String?
+  hikaye            String?
+  sahipAdi          String?
+  sahipFotoUrl      String?
+  sahipFotoPublicId String?
+  sahipBiyografi    String?
+  malzemeBilgi      String?
 
   guncelleme DateTime @updatedAt
 }
