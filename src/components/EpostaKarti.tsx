@@ -1,6 +1,3 @@
-"use client";
-
-import { useTelefonMu } from "@/lib/cihaz";
 
 const KONU = "Antik Parşömen — Bilgi talebi";
 
@@ -15,12 +12,17 @@ const KONU = "Antik Parşömen — Bilgi talebi";
  *   açıyor. Kurulu değilse veya kullanılmıyorsa boş/kullanışsız bir ekran
  *   çıkıyor. Orada doğru olan Gmail'in web arayüzü.
  *
- * Sunucuda hangi cihaz olduğunu bilemiyoruz. Bu yüzden Gmail adresiyle
- * başlıyor, bileşen yüklendikten sonra telefonsa mailto'ya geçiyoruz —
- * böylece sunucu ve tarayıcı çıktısı ilk anda uyuşuyor.
+ * Karar sunucuda veriliyor (bkz. lib/cihaz.ts): sayfa daha ilk andan
+ * doğru adresle geliyor, JavaScript yüklenmesini beklemiyor.
  */
-export default function EpostaKarti({ adres }: { adres: string }) {
-  const telefon = useTelefonMu();
+export default function EpostaKarti({
+  adres,
+  telefon,
+}: {
+  adres: string;
+  /** Sunucuda tespit edildi */
+  telefon: boolean;
+}) {
 
   const mailto = `mailto:${adres}?subject=${encodeURIComponent(KONU)}`;
   const gmail =

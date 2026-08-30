@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useTelefonMu } from "@/lib/cihaz";
 import { mesajSil, okunduDegistir } from "./actions";
 
 type Mesaj = {
@@ -17,16 +16,18 @@ type Mesaj = {
 export default function MesajKarti({
   mesaj,
   yoneticiEposta,
+  telefon,
 }: {
   mesaj: Mesaj;
   /** Oturumdaki yöneticinin adresi — Gmail'in doğru hesapta açılması için */
   yoneticiEposta: string;
+  /** Sunucuda tespit edildi; hangi yazma ekranının açılacağını belirler */
+  telefon: boolean;
 }) {
   const [acik, setAcik] = useState(!mesaj.okundu);
   const [bekliyor, baslat] = useTransition();
   const [onayIstendi, setOnayIstendi] = useState(false);
   const [kopyalandi, setKopyalandi] = useState(false);
-  const telefon = useTelefonMu();
 
   const konu = encodeURIComponent(`Re: ${mesaj.konu}`);
   const alici = encodeURIComponent(mesaj.email);

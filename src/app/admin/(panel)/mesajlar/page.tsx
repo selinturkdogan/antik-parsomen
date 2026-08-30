@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { adminGerekli } from "@/lib/yetki";
 import { tarihYaz } from "@/lib/tarih";
+import { telefonMu } from "@/lib/cihaz";
 import MesajKarti from "./MesajKarti";
 import { tumunuOkunduYap } from "./actions";
 
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function MesajlarSayfasi() {
   const oturum = await adminGerekli();
+  const telefon = await telefonMu();
 
   const mesajlar = await prisma.mesaj.findMany({
     orderBy: { olusturma: "desc" },
@@ -60,6 +62,7 @@ export default async function MesajlarSayfasi() {
             <MesajKarti
               key={m.id}
               yoneticiEposta={oturum.email}
+              telefon={telefon}
               mesaj={{
                 id: m.id,
                 adSoyad: m.adSoyad,

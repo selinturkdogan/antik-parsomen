@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import EpostaKarti from "@/components/EpostaKarti";
+import { telefonMu } from "@/lib/cihaz";
 import IletisimFormu from "./IletisimFormu";
 
 export const metadata: Metadata = {
@@ -45,6 +46,7 @@ function telefonBaglantisi(numara: string) {
 
 export default async function IletisimSayfasi() {
   const ayar = await prisma.siteAyar.findUnique({ where: { id: "tek" } });
+  const telefon = await telefonMu();
 
   const adres = ayar?.adres?.trim() || "";
 
@@ -128,7 +130,9 @@ export default async function IletisimSayfasi() {
           />
         )}
 
-        {ayar?.email?.trim() && <EpostaKarti adres={ayar.email} />}
+        {ayar?.email?.trim() && (
+          <EpostaKarti adres={ayar.email} telefon={telefon} />
+        )}
       </section>
 
       {/* ---------- Bilgiler + Form ---------- */}
