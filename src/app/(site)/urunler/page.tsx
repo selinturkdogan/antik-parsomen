@@ -3,18 +3,41 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import UrunFiltre from "@/components/UrunFiltre";
 import UrunKart from "@/components/UrunKart";
+import Sayfalama from "@/components/Sayfalama";
 
 export const metadata: Metadata = { title: "Ürünler" };
 export const dynamic = "force-dynamic";
 
+/** Bir sayfada kaç ürün gösterilecek */
+const SAYFA_BASINA = 9;
+
 export default async function UrunlerSayfasi(props: PageProps<"/urunler">) {
   // Bu sürümde searchParams bir Promise — await ile okunuyor
-  const { q, kategori } = await props.searchParams;
+  const { q, kategori, sayfa } = await props.searchParams;
 
   const arama = typeof q === "string" ? q.trim() : "";
   const kategoriSlug = typeof kategori === "string" ? kategori : "";
 
-  const [kategoriler, urunler] = await Promise.all([
+  // Adresten gelen değere güvenmiyoruz: sayı değilse veya 1'den küçükse
+  // ilk sayfayı gösteriyoruz.
+  const istenenSayfa = Math.max(1, Number(sayfa) || 1);
+
+  // Filtre koşulunu bir kez kurup hem sayımda hem listede kullanıyoruz;
+  // ikisi ayrı yazılsa biri güncellenip diğeri unutulabilirdi.
+  const kosul = {
+    yayinda: true,
+    ...(kategoriSlug ? { kategori: { slug: kategoriSlug } } : {}),
+    ...(arama
+      ? {
+          OR: [
+            { ad: { contains: arama, mode: "insensitive" as const } },
+            { aciklama: { contains: arama, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
+  };
+
+  const [kategoriler, toplamUrun] = await Promise.all([
     // Filtrede yalnızca içinde yayında ürün olan kategoriler görünsün.
     // Ziyaretçi boş bir kategoriye tıklayıp "ürün bulunamadı" görmesin.
     // Seçili kategori boşalmışsa yine de listede kalsın, yoksa
@@ -28,26 +51,24 @@ export default async function UrunlerSayfasi(props: PageProps<"/urunler">) {
       },
       orderBy: { sira: "asc" },
     }),
-    prisma.urun.findMany({
-      where: {
-        yayinda: true,
-        ...(kategoriSlug ? { kategori: { slug: kategoriSlug } } : {}),
-        ...(arama
-          ? {
-              OR: [
-                { ad: { contains: arama, mode: "insensitive" } },
-                { aciklama: { contains: arama, mode: "insensitive" } },
-              ],
-            }
-          : {}),
-      },
-      include: {
-        kategori: true,
-        gorseller: { orderBy: { sira: "asc" }, take: 1 },
-      },
-      orderBy: [{ oneCikan: "desc" }, { olusturma: "desc" }],
-    }),
+    prisma.urun.count({ where: kosul }),
   ]);
+
+  const toplamSayfa = Math.max(1, Math.ceil(toplamUrun / SAYFA_BASINA));
+
+  // Elle "?sayfa=99" yazılırsa son sayfayı gösteriyoruz; boş ekran çıkmasın
+  const simdikiSayfa = Math.min(istenenSayfa, toplamSayfa);
+
+  const urunler = await prisma.urun.findMany({
+    where: kosul,
+    include: {
+      kategori: true,
+      gorseller: { orderBy: { sira: "asc" }, take: 1 },
+    },
+    orderBy: [{ oneCikan: "desc" }, { olusturma: "desc" }],
+    skip: (simdikiSayfa - 1) * SAYFA_BASINA,
+    take: SAYFA_BASINA,
+  });
 
   const secili = kategoriler.find((k) => k.slug === kategoriSlug);
   const filtreVar = Boolean(arama || kategoriSlug);
@@ -99,15 +120,19 @@ export default async function UrunlerSayfasi(props: PageProps<"/urunler">) {
       {/* ---------------- Sonuç satırı ---------------- */}
       <div className="mt-16 flex flex-wrap items-baseline justify-between gap-4">
         <p className="text-sm text-murekkep-500">
-          <span className="font-semibold text-murekkep-900">
-            {urunler.length}
-          </span>{" "}
-          ürün listeleniyor
+          <span className="font-semibold text-murekkep-900">{toplamUrun}</span>{" "}
+          ürün bulundu
           {arama && (
             <>
               {" "}
               — <span className="text-murekkep-700">&ldquo;{arama}&rdquo;</span>{" "}
               için
+            </>
+          )}
+          {toplamSayfa > 1 && (
+            <>
+              {" · "}
+              Sayfa {simdikiSayfa} / {toplamSayfa}
             </>
           )}
         </p>
@@ -144,11 +169,23 @@ export default async function UrunlerSayfasi(props: PageProps<"/urunler">) {
           )}
         </div>
       ) : (
-        <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-9">
-          {urunler.map((u) => (
-            <UrunKart key={u.id} urun={u} />
-          ))}
-        </div>
+        <>
+          <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-9">
+            {urunler.map((u) => (
+              <UrunKart key={u.id} urun={u} />
+            ))}
+          </div>
+
+          <Sayfalama
+            simdiki={simdikiSayfa}
+            toplamSayfa={toplamSayfa}
+            temelYol="/urunler"
+            parametreler={{
+              ...(arama ? { q: arama } : {}),
+              ...(kategoriSlug ? { kategori: kategoriSlug } : {}),
+            }}
+          />
+        </>
       )}
     </main>
   );

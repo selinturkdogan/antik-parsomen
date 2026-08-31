@@ -23,6 +23,8 @@ export default function UrunFiltre({ kategoriler }: { kategoriler: Kategori[] })
       const p = new URLSearchParams(searchParams.toString());
       if (arama.trim()) p.set("q", arama.trim());
       else p.delete("q");
+      // Arama değişti: 3. sayfada kalırsak boş liste görünebilir
+      p.delete("sayfa");
       router.replace(`${pathname}?${p.toString()}`, { scroll: false });
     }, 300);
 
@@ -33,6 +35,7 @@ export default function UrunFiltre({ kategoriler }: { kategoriler: Kategori[] })
     const p = new URLSearchParams(searchParams.toString());
     if (slug) p.set("kategori", slug);
     else p.delete("kategori");
+    p.delete("sayfa"); // yeni filtrede baştan başla
     router.replace(`${pathname}?${p.toString()}`, { scroll: false });
   }
 
